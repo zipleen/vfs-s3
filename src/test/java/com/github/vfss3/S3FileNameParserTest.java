@@ -4,8 +4,11 @@ import com.github.vfss3.parser.S3FileNameParser;
 import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.util.URIUtils;
 import org.assertj.core.api.AssertDelegateTarget;
 import org.testng.annotations.Test;
+
+import java.net.URISyntaxException;
 
 import static org.apache.commons.vfs2.FileType.FOLDER;
 import static org.apache.commons.vfs2.FileType.IMAGINARY;
@@ -73,7 +76,7 @@ public class S3FileNameParserTest {
     }
 
     @Test
-    public void checkPathStyleUrl() throws FileSystemException {
+    public void checkPathStyleUrl() throws FileSystemException, URISyntaxException {
         assertThat(parse("s3://s3.amazonaws.com/bucket")).
                 hasEndpoint("s3.amazonaws.com").
                 hasPathPrefix("bucket");
@@ -110,7 +113,13 @@ public class S3FileNameParserTest {
                 hasEndpoint("s3.eu-central-1.amazonaws.com").
                 hasPathPrefix("bucket").
                 hasType(IMAGINARY).
-                hasPath("/conc urrent");
+                hasPath("/conc%20urrent");
+
+        assertThat(parse("s3://s3.eu-central-1.amazonaws.com/bucket/conc urrent/" + URIUtils.encodePath("file^{#.mp3"))).
+                hasEndpoint("s3.eu-central-1.amazonaws.com").
+                hasPathPrefix("bucket").
+                hasType(IMAGINARY).
+                hasPath("/conc%20urrent/file%5E%7B%23.mp3");
 
         assertThat(parse("s3://frifqsbag2em.compat.objectstorage.eu-frankfurt-1.oraclecloud.com/s3-tests//some file")).
                 hasEndpoint("frifqsbag2em.compat.objectstorage.eu-frankfurt-1.oraclecloud.com").

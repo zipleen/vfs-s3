@@ -6,8 +6,10 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.Selectors;
+import org.apache.commons.vfs2.util.URIUtils;
 import org.testng.annotations.Test;
 
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -26,7 +28,7 @@ public class CopyFilesTest extends AbstractS3FileSystemTest {
     private FileObject rootFolder;
 
     @Test
-    public void createDirOk() throws FileSystemException {
+    public void createDirOk() throws FileSystemException, URISyntaxException {
         rootFolder = resolveFile(rootName);
         rootFolder.createFolder();
 
@@ -39,6 +41,7 @@ public class CopyFilesTest extends AbstractS3FileSystemTest {
         rootFolder.resolveFile("child-dir").createFolder();
         rootFolder.resolveFile("child-dir/descendant.tmp").createFile();
         rootFolder.resolveFile("child-dir/descendant2.tmp").createFile();
+        rootFolder.resolveFile("child-dir/descendant2%27%7B%23.tmp").createFile(); // that's descendant2'{#.tmp
         rootFolder.resolveFile("child-dir/descendant-dir").createFolder();
 
         FileObject[] files;
@@ -47,7 +50,7 @@ public class CopyFilesTest extends AbstractS3FileSystemTest {
         files = rootFolder.findFiles(Selectors.SELECT_FOLDERS);
         assertEquals(files.length, 3);
         files = rootFolder.findFiles(Selectors.SELECT_FILES);
-        assertEquals(files.length, 4);
+        assertEquals(files.length, 5);
         files = rootFolder.findFiles(Selectors.EXCLUDE_SELF);
         assertEquals(files.length, 6);
     }

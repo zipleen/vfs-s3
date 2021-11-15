@@ -10,6 +10,7 @@ import com.github.vfss3.operations.IAclGetter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.vfs2.*;
+import org.apache.commons.vfs2.util.URIUtils;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -307,14 +308,19 @@ public class S3FileObject extends AbstractFileObject<S3FileSystem> {
             if (!summary.getKey().equals(path)) {
                 // strip path from name (leave only base name)
                 final String stripPath = summary.getKey().substring(path.length());
-                FileObject childObject = resolveFile(stripPath, CHILD);
-                S3FileObject s3FileObject = (S3FileObject) FileObjectUtils.unwrap(childObject);
+                try {
+                    final String uriEncodedStripPath = URIUtils.encodePath(stripPath);
+                    FileObject childObject = resolveFile(uriEncodedStripPath, CHILD);
+                    S3FileObject s3FileObject = (S3FileObject) FileObjectUtils.unwrap(childObject);
 
-                if (s3FileObject != null) {
-                    s3FileObject.doAttach(FILE, new ObjectMetadataHolder(summary));
-                    s3FileObject.setParent(this);
+                    if (s3FileObject != null) {
+                        s3FileObject.doAttach(FILE, new ObjectMetadataHolder(summary));
+                        s3FileObject.setParent(this);
 
-                    resolvedChildren.add(childObject);
+                        resolvedChildren.add(childObject);
+                    }
+                } catch (URISyntaxException e) {
+                    throw new FileSystemException("Invalid filename to URI path conversion", e);
                 }
             }
         }

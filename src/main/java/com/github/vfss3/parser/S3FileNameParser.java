@@ -114,7 +114,7 @@ public class S3FileNameParser extends AbstractFileNameParser {
 
             String bucket = hostNameMatcher.group("bucket");
             String host = uri.getHost();
-            String key = uri.getPath();
+            String key = uri.getRawPath();
 
             if ((bucket != null) && (bucket.trim().length() > 0)) {
                 // Has bucket inside URL
@@ -124,7 +124,7 @@ public class S3FileNameParser extends AbstractFileNameParser {
                     host = "s3.amazonaws.com";
                 }
             } else {
-                final Matcher pathMatcher = PATH.matcher(uri.getPath());
+                final Matcher pathMatcher = PATH.matcher(uri.getRawPath());
 
                 if (pathMatcher.matches()) {
                     String pathBucket = pathMatcher.group("bucket");
@@ -160,9 +160,9 @@ public class S3FileNameParser extends AbstractFileNameParser {
             String key;
 
             if ((bucket != null) && (bucket.trim().length() > 0)) {
-                key = uri.getPath();
+                key = uri.getRawPath();
             } else {
-                final Matcher pathMatcher = PATH.matcher(uri.getPath());
+                final Matcher pathMatcher = PATH.matcher(uri.getRawPath());
 
                 if (pathMatcher.matches()) {
                     bucket = pathMatcher.group("bucket");
@@ -187,9 +187,9 @@ public class S3FileNameParser extends AbstractFileNameParser {
             String key;
 
             if ((bucket != null) && (bucket.trim().length() > 0)) {
-                key = uri.getPath();
+                key = uri.getRawPath();
             } else {
-                final Matcher pathMatcher = PATH.matcher(uri.getPath());
+                final Matcher pathMatcher = PATH.matcher(uri.getRawPath());
 
                 if (pathMatcher.matches()) {
                     bucket = pathMatcher.group("bucket");
@@ -233,7 +233,7 @@ public class S3FileNameParser extends AbstractFileNameParser {
                     null,
                     bucket,
                     (region != null) ? region : DEFAULT_ALIYUN_SIGNING_REGION,
-                    uri.getPath(),
+                    uri.getRawPath(),
                     accessKey,
                     secretKey,
                     new PlatformFeaturesImpl(true, false, true, false, true)
@@ -255,7 +255,7 @@ public class S3FileNameParser extends AbstractFileNameParser {
             if ((namespace == null) || (namespace.trim().length() == 0)) {
                 throw new FileSystemException("Virtual host style URLs are not supported on Oracle Cloud Storage Service  [" + filename + "]");
             } else {
-                final Matcher pathMatcher = PATH.matcher(uri.getPath());
+                final Matcher pathMatcher = PATH.matcher(uri.getRawPath());
 
                 if (pathMatcher.matches()) {
                     bucket = pathMatcher.group("bucket");
@@ -303,7 +303,7 @@ public class S3FileNameParser extends AbstractFileNameParser {
                     null,
                     bucket,
                     region,
-                    uri.getPath(),
+                    uri.getRawPath(),
                     accessKey,
                     secretKey,
                     new PlatformFeaturesImpl(true, true, false, true, true)
@@ -335,7 +335,7 @@ public class S3FileNameParser extends AbstractFileNameParser {
                     null,
                     bucket,
                     region,
-                    uri.getPath(),
+                    uri.getRawPath(),
                     accessKey,
                     secretKey,
                     new PlatformFeaturesImpl(true, true, false, true, true)
@@ -354,7 +354,7 @@ public class S3FileNameParser extends AbstractFileNameParser {
                 host.append(':').append(uri.getPort());
             }
 
-            final Matcher pathMatcher = PATH.matcher(uri.getPath());
+            final Matcher pathMatcher = PATH.matcher(uri.getRawPath());
 
             if (pathMatcher.matches()) {
                 S3FileName file = buildS3FileName(
